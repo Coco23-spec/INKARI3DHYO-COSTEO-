@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora INKARI 3D HYO — Elegoo Centauri Carbon 2</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0eff5;--card:#fff;--border:#e4e2ee;--text:#1a1830;--muted:#72708a;
+  --accent:#6d4fc2;--accent-light:#f0eeff;--accent-mid:#b8a8e8;
+  --green:#0f6e56;--green-bg:#edfdf5;--green-border:#a0e6c4;
+  --yellow:#b8860b;--yellow-bg:#fff8e1;
+  --danger:#c0392b;--danger-bg:#fdecea;
+  --radius:10px;--radius-lg:14px;
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:1rem}
+.app{max-width:740px;margin:0 auto}
+.header{display:flex;align-items:center;gap:10px;margin-bottom:1.25rem;padding:12px 16px;background:var(--card);border-radius:var(--radius-lg);border:1px solid var(--border)}
+.header-icon{width:38px;height:38px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;flex-shrink:0}
+.header-title{font-size:16px;font-weight:600;color:var(--text)}
+.header-sub{font-size:12px;color:var(--muted);margin-top:1px}
+.tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:1rem;background:var(--card);border-radius:var(--radius-lg) var(--radius-lg) 0 0;overflow:hidden}
+.tab{flex:1;padding:11px 8px;font-size:12px;cursor:pointer;border:none;background:none;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px;font-weight:500}
+.tab.active{color:var(--accent);border-bottom:2px solid var(--accent);background:var(--accent-light)}
+.tab:hover:not(.active){background:#f8f7fc;color:var(--text)}
+.section{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:.875rem}
+.section-title{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.6px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+.field{display:flex;flex-direction:column;gap:4px}
+label{font-size:12px;color:var(--muted);font-weight:500}
+input,select{width:100%;font-size:13px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:#fafafa;color:var(--text);font-family:inherit;outline:none;transition:border .15s}
+input:focus,select:focus{border-color:var(--accent);background:#fff}
+.color-list{display:flex;flex-direction:column;gap:8px}
+.color-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;align-items:end}
+.color-row label{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:3px}
+.icon-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:#fafafa;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:all .15s;font-size:16px;flex-shrink:0}
+.icon-btn:hover{background:var(--danger-bg);color:var(--danger);border-color:var(--danger)}
+.icon-btn.add{background:var(--accent-light);color:var(--accent);border-color:var(--accent-mid)}
+.icon-btn.add:hover{background:var(--accent);color:#fff}
+.add-color-row{display:flex;gap:8px;margin-top:6px}
+.margin-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.mbtn{padding:10px 12px;border-radius:10px;border:1.5px solid var(--border);background:#fafafa;cursor:pointer;font-size:12px;text-align:left;color:var(--text);transition:all .15s;font-family:inherit}
+.mbtn:hover{background:var(--accent-light);border-color:var(--accent-mid)}
+.mbtn.active{border:2px solid var(--accent);background:var(--accent-light)}
+.mbtn.active .mlabel{color:var(--accent)}
+.mlabel{font-weight:600;font-size:13px;margin-bottom:2px}
+.msub{font-size:11px;color:var(--muted)}
+.results{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:.875rem}
+.result-card{background:#f8f8f8;border-radius:10px;padding:12px 14px;border:1px solid var(--border)}
+.result-card.main{background:var(--green-bg);border:1.5px solid var(--green-border);grid-column:1/-1}
+.result-label{font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:500}
+.result-val{font-size:22px;font-weight:600;color:var(--text)}
+.result-card.main .result-val{color:var(--green);font-size:28px}
+.result-card.main .result-label{color:var(--green)}
+.desglose{border-top:1px solid #f0f0f0;padding-top:12px;margin-top:8px}
+.drow{display:flex;justify-content:space-between;padding:4px 0;font-size:13px;color:var(--muted)}
+.drow.total{color:var(--text);font-weight:600;border-top:1px solid var(--border);margin-top:4px;padding-top:8px}
+.toggle-link{font-size:12px;color:var(--accent);cursor:pointer;background:none;border:none;padding:0;margin-top:8px;font-family:inherit;display:flex;align-items:center;gap:4px}
+.htable{width:100%;border-collapse:collapse;font-size:12px}
+.htable th{text-align:left;padding:8px;color:var(--muted);border-bottom:1px solid var(--border);font-weight:600;font-size:11px;text-transform:uppercase}
+.htable td{padding:8px;border-bottom:1px solid #f5f5f5;color:var(--text)}
+.htable tr:hover td{background:#fafafa}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer}
+.badge-ok{background:var(--green-bg);color:var(--green)}
+.badge-pend{background:var(--yellow-bg);color:var(--yellow)}
+.btn-row{display:flex;gap:10px;margin-top:.5rem;flex-wrap:wrap}
+.btn{padding:8px 16px;font-size:12px;border-radius:8px;border:1px solid var(--border);background:#fff;cursor:pointer;color:var(--text);font-family:inherit;display:inline-flex;align-items:center;gap:6px;transition:all .15s;font-weight:500}
+.btn:hover{background:#f5f5f5;border-color:#bbb}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.primary:hover{background:#5a3daa}
+.btn.danger{background:var(--danger-bg);color:var(--danger);border-color:var(--danger)}
+.totales-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:1rem}
+.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.45);z-index:999;display:flex;align-items:center;justify-content:center}
+.modal{background:var(--card);border-radius:var(--radius-lg);padding:1.5rem;width:320px;border:1px solid var(--border)}
+.modal h3{font-size:15px;font-weight:600;margin-bottom:.5rem}
+.modal p{font-size:13px;color:var(--muted);margin-bottom:1rem}
+.pin-input{display:flex;gap:8px;justify-content:center;margin-bottom:1rem}
+.pin-input input{width:48px;height:52px;text-align:center;font-size:22px;font-weight:600;border:1.5px solid var(--border);border-radius:10px;background:#fafafa;color:var(--text)}
+.pin-input input:focus{border-color:var(--accent)}
+.modal-btns{display:flex;gap:8px}
+.fil-row{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid #f5f5f5;font-size:13px}
+.fil-row:last-child{border-bottom:none}
+.fil-row input{font-size:13px}
+.cfg-result{margin-top:12px;padding:12px;background:#f8f8f8;border-radius:8px;border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.cfg-result-val{font-weight:600;color:var(--green);font-size:15px}
+.pin-badge{font-size:11px;padding:2px 8px;border-radius:12px;font-weight:500;background:var(--accent-light);color:var(--accent)}
+.alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-top:8px}
+.alert-err{background:var(--danger-bg);color:var(--danger);border:1px solid #f5c6c4}
+.alert-ok{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.empty{text-align:center;color:#aaa;font-size:13px;padding:2.5rem 0}
+.hidden{display:none}
+.pieza-row{display:grid;grid-template-columns:2fr 1fr 0.7fr 0.7fr 1fr auto;gap:6px;align-items:end;padding:8px 0;border-bottom:1px solid #f5f5f5}
+.pieza-row:last-child{border-bottom:none}
+.pieza-row label{font-size:11px;color:var(--muted);font-weight:500}
+.pieza-header{display:grid;grid-template-columns:2fr 1fr 0.7fr 0.7fr 1fr auto;gap:6px;padding:6px 0;border-bottom:2px solid var(--border);margin-bottom:4px}
+.pieza-header span{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.pieza-precio{font-size:13px;font-weight:600;color:var(--green);padding:8px 10px;background:var(--green-bg);border:1px solid var(--green-border);border-radius:8px;text-align:center}
+.piezas-total{background:#0d0d1a;border-radius:10px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+.piezas-total-lbl{color:#aaa;font-size:12px;text-transform:uppercase;letter-spacing:1px}
+.piezas-total-val{color:#c8a84b;font-size:22px;font-weight:800}
+@media(max-width:500px){
+  .row,.row3,.results,.margin-btns,.totales-grid{grid-template-columns:1fr}
+  .result-card.main{grid-column:1}
+  .tab{padding:10px 6px;font-size:11px}
+  .color-row{grid-template-columns:1fr 1fr;gap:6px}
+  .color-row .color-fil-col{grid-column:1/-1}
+  .fil-row{grid-template-columns:1fr 1fr auto}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="header">
+  <div class="header-icon"><i class="ti ti-printer" aria-hidden="true"></i></div>
+  <div>
+    <div class="header-title">Calculadora INKARI 3D HYO</div>
+    <div class="header-sub">Elegoo Centauri Carbon 2 — v2.0</div>
+  </div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+    <span id="pin-status-badge" class="pin-badge" style="display:none"><i class="ti ti-lock" style="font-size:11px"></i> PIN activo</span>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab active" onclick="showTab('calc',this)"><i class="ti ti-calculator"></i> Calcular</button>
+  <button class="tab" onclick="showTab('hist',this)"><i class="ti ti-history"></i> Historial</button>
+  <button class="tab" onclick="showTab('filamentos',this)"><i class="ti ti-needle-thread"></i> Filamentos</button>
+  <button class="tab" onclick="showTab('cfg',this)"><i class="ti ti-settings"></i> Config</button>
+</div>
+
+<!-- ===================== CALCULADORA ===================== -->
+<div id="tab-calc">
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-file-description" aria-hidden="true"></i> Datos del trabajo
+      <span style="margin-left:auto;display:flex;align-items:center;gap:6px">
+        <span style="font-size:11px;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">Modo:</span>
+        <label style="display:flex;align-items:center;gap:5px;text-transform:none;letter-spacing:0;color:var(--text);font-size:12px;cursor:pointer">
+          <input type="checkbox" id="modo-piezas-toggle" onchange="toggleModoPiezas()" style="width:auto;accent-color:var(--accent)"> Por pieza individual
+        </label>
+      </span>
+    </div>
+    <div class="row" id="datos-normal">
+      <div class="field"><label>Cliente / proyecto</label><input type="text" id="cliente" value="Mi Proyecto"/></div>
+      <div class="field"><label>Número de piezas (total)</label><input type="number" id="piezas" value="1" min="1" oninput="calcular()"/></div>
+    </div>
+    <div id="datos-piezas-cliente" class="hidden">
+      <div class="field" style="margin-bottom:10px"><label>Cliente / proyecto</label><input type="text" id="cliente2" value="Mi Proyecto" oninput="document.getElementById('cliente').value=this.value"/></div>
+    </div>
+  </div>
+
+  <!-- MODO PIEZAS INDIVIDUALES -->
+  <div id="seccion-piezas-ind" class="hidden">
+    <div class="section">
+      <div class="section-title"><i class="ti ti-stack-2" aria-hidden="true"></i> Piezas individuales
+        <button class="icon-btn add" onclick="addPiezaRow()" style="width:26px;height:26px;margin-left:auto" title="Agregar pieza"><i class="ti ti-plus" style="font-size:13px"></i></button>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Ingresa los datos de cada pieza según el slicer. El precio se calcula individualmente.</div>
+      <div class="pieza-header">
+        <span>Nombre pieza</span><span>Gramos</span><span>Horas</span><span>Min</span><span>Precio</span><span></span>
+      </div>
+      <div id="piezas-list"></div>
+      <div class="piezas-total">
+        <div class="piezas-total-lbl">Total del conjunto</div>
+        <div class="piezas-total-val" id="piezas-total-val">S/ 0.00</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILAMENTO MULTICOLOR -->
+  <div class="section" id="seccion-fil-normal">
+    <div class="section-title"><i class="ti ti-needle-thread" aria-hidden="true"></i> Filamento
+      <span style="margin-left:auto;display:flex;align-items:center;gap:6px">
+        <span style="font-size:11px;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">Modo:</span>
+        <label style="display:flex;align-items:center;gap:5px;text-transform:none;letter-spacing:0;color:var(--text);font-size:12px;cursor:pointer">
+          <input type="checkbox" id="multicolor-toggle" onchange="toggleMulticolor()" style="width:auto;accent-color:var(--accent)"> Multicolor
+        </label>
+      </span>
+    </div>
+
+    <div id="modo-unico">
+      <div class="row">
+        <div class="field">
+          <label>Filamento</label>
+          <select id="filamento" onchange="actualizarPrecioFil()">
+          </select>
+        </div>
+        <div class="field"><label>Precio S/·kg</label><input type="number" id="precio-fil" value="65" min="1" oninput="calcular()"/></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>Gramos usados (slicer)</label><input type="number" id="gramos" value="50" min="1" oninput="calcular()"/></div>
+        <div class="field"><label>Desperdicio / soporte (%)</label><input type="number" id="desperdicio" value="10" min="0" max="50" oninput="calcular()"/></div>
+      </div>
+    </div>
+
+    <div id="modo-multi" class="hidden">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Hasta 4 colores/materiales. Ingresa gramos de cada uno del slicer.</div>
+      <div class="color-list" id="color-list"></div>
+      <div class="add-color-row">
+        <button class="icon-btn add" onclick="addColorRow()" id="add-color-btn" title="Agregar color"><i class="ti ti-plus" style="font-size:15px"></i></button>
+        <span style="font-size:12px;color:var(--muted);align-self:center">Agregar color (máx. 4)</span>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <div class="field"><label>Desperdicio global (%)</label><input type="number" id="desperdicio-multi" value="10" min="0" max="50" oninput="calcular()"/></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIEMPO -->
+  <div class="section" id="seccion-tiempo-normal">
+    <div class="section-title"><i class="ti ti-clock" aria-hidden="true"></i> Tiempo de impresión</div>
+    <div class="row">
+      <div class="field"><label>Horas (del slicer)</label><input type="number" id="horas" value="3.5" step="0.5" min="0.5" oninput="calcular()"/></div>
+      <div class="field"><label>Costo máquina S/·hora</label><input type="number" id="costo-hora" value="1.200" step="0.001" oninput="calcular()"/></div>
+    </div>
+  </div>
+
+  <!-- DISEÑO -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-pencil" aria-hidden="true"></i> Diseño 3D</div>
+    <div class="row">
+      <div class="field">
+        <label>Tipo de diseño</label>
+        <select id="tipo-diseno" onchange="toggleDiseno()">
+          <option value="propio">Diseño propio (SolidWorks)</option>
+          <option value="descargado">Diseño descargado</option>
+          <option value="sin">Sin diseño (solo impresión)</option>
+        </select>
+      </div>
+      <div class="field" id="campo-horas-diseno">
+        <label>Horas de diseño</label>
+        <input type="number" id="horas-diseno" value="2" min="0" step="0.5" oninput="calcular()"/>
+      </div>
+    </div>
+    <div class="row" id="campo-tarifa">
+      <div class="field">
+        <label>Tarifa S/·hora diseño</label>
+        <input type="number" id="tarifa-diseno" value="35" min="0" oninput="calcular()"/>
+      </div>
+      <div class="field" id="campo-costo-desc" style="display:none">
+        <label>Costo archivo STL (S/)</label>
+        <input type="number" id="costo-desc" value="0" min="0" oninput="calcular()"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACABADOS -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-brush" aria-hidden="true"></i> Acabados y extras</div>
+
+    <div class="row" style="margin-bottom:4px">
+      <div class="field"><label>Lijado (S/)</label><input type="number" id="lijado" value="0" min="0" oninput="calcular()"/></div>
+      <div class="field">
+        <label style="display:flex;align-items:center;gap:6px">Pintado
+          <label style="font-weight:400;display:flex;align-items:center;gap:4px;cursor:pointer">
+            <input type="checkbox" id="pintado-toggle" onchange="togglePintado()" style="width:auto;accent-color:var(--accent)"> Incluir
+          </label>
+        </label>
+        <input type="number" id="pintado-mano" value="0" min="0" oninput="calcular()" placeholder="Mano de obra S/"/>
+      </div>
+    </div>
+
+    <div id="pintado-detalle" class="hidden" style="background:var(--accent-light);border-radius:10px;padding:12px;margin-bottom:10px;border:1px solid var(--accent-mid)">
+      <div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px"><i class="ti ti-droplet" style="font-size:13px"></i> Detalle de pintura</div>
+      <div class="row3">
+        <div class="field"><label>Precio pintura S/·100ml</label><input type="number" id="pintura-precio" value="25" min="0" oninput="calcular()"/></div>
+        <div class="field"><label>ml usados</label><input type="number" id="pintura-ml" value="30" min="0" oninput="calcular()"/></div>
+        <div class="field"><label>Costo pintura calculado</label><input type="number" id="pintura-costo-calc" readonly style="background:#e8f5ff;color:var(--accent);font-weight:600" placeholder="S/ 0.00"/></div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Costo total pintado = mano de obra + costo de pintura</div>
+    </div>
+
+    <div class="row3">
+      <div class="field"><label>Envío S/</label><input type="number" id="envio" value="0" min="0" oninput="calcular()"/></div>
+      <div class="field"><label>Urgencia S/</label><input type="number" id="urgencia" value="0" min="0" oninput="calcular()"/></div>
+      <div class="field"><label>Otros extras S/</label><input type="number" id="otros" value="0" min="0" oninput="calcular()"/></div>
+    </div>
+  </div>
+
+  <!-- MARGEN -->
+  <div class="section">
+    <div class="section-title"><i class="ti ti-coin" aria-hidden="true"></i> Margen de ganancia</div>
+    <div class="margin-btns">
+      <button class="mbtn" onclick="setMargen(0.20,this)">
+        <div class="mlabel">Mínimo — 20%</div>
+        <div class="msub">Amigos / prototipos</div>
+      </button>
+      <button class="mbtn active" onclick="setMargen(0.45,this)">
+        <div class="mlabel">Estándar — 45%</div>
+        <div class="msub">Clientes normales</div>
+      </button>
+      <button class="mbtn" onclick="setMargen(0.65,this)">
+        <div class="mlabel">Alto — 65%</div>
+        <div class="msub">Con diseño propio</div>
+      </button>
+      <button class="mbtn" onclick="setMargen(0.80,this)">
+        <div class="mlabel">Premium — 80%</div>
+        <div class="msub">Urgente / complejo</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- RESULTADO PÚBLICO -->
+  <div class="results">
+    <div class="result-card main">
+      <div class="result-label">Precio sugerido al cliente (redondeado al S/ 5)</div>
+      <div class="result-val" id="precio-final">S/ 0.00</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <button class="toggle-link" onclick="toggleDesglose()">
+      <i class="ti ti-chevron-down" id="chev-icon"></i> <span id="desglose-lbl">Ver desglose de costos</span>
+    </button>
+    <div class="desglose hidden" id="desglose">
+      <div class="drow"><span>Costo filamento(s)</span><span id="d-fil">S/ 0.00</span></div>
+      <div class="drow"><span>Costo máquina</span><span id="d-maq">S/ 0.00</span></div>
+      <div class="drow"><span>Costo diseño</span><span id="d-dis">S/ 0.00</span></div>
+      <div class="drow"><span>Lijado</span><span id="d-lij">S/ 0.00</span></div>
+      <div class="drow"><span>Pintado (mano de obra + pintura)</span><span id="d-pin">S/ 0.00</span></div>
+      <div class="drow"><span>Envío + urgencia + otros</span><span id="d-ext">S/ 0.00</span></div>
+      <div class="drow total"><span>Costo base total</span><span id="d-base">S/ 0.00</span></div>
+      <div class="drow"><span>Ganancia (<span id="d-pct">45</span>%)</span><span id="d-gan">S/ 0.00</span></div>
+      <div class="drow total"><span>Precio × pieza</span><span id="d-pieza">S/ 0.00</span></div>
+      <div class="drow total"><span>Precio total (<span id="d-piezas2">1</span> pzs)</span><span id="d-total">S/ 0.00</span></div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn primary" onclick="guardarPedido()"><i class="ti ti-device-floppy"></i> Guardar en historial</button>
+    <button class="btn" style="background:#1a1830;color:#fff;border-color:#1a1830" onclick="generarCotizacionPDF()"><i class="ti ti-file-invoice"></i> Generar cotización PDF</button>
+    <button class="btn" onclick="limpiarFormulario()"><i class="ti ti-refresh"></i> Nueva cotización</button>
+  </div>
+</div>
+
+<!-- ===================== HISTORIAL ===================== -->
+<div id="tab-hist" class="hidden">
+  <div id="hist-locked">
+    <div class="section" style="text-align:center;padding:2rem">
+      <i class="ti ti-lock" style="font-size:48px;color:var(--accent);display:block;margin-bottom:12px"></i>
+      <div style="font-size:15px;font-weight:600;margin-bottom:6px">Historial protegido</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:1.25rem">Tu ganancia y margen son privados. Ingresa tu PIN para ver.</div>
+      <div class="pin-input" id="pin-input-hist">
+        <input type="password" maxlength="1" oninput="pinNav(this,0,'hist')" style="ime-mode:disabled">
+        <input type="password" maxlength="1" oninput="pinNav(this,1,'hist')" style="ime-mode:disabled">
+        <input type="password" maxlength="1" oninput="pinNav(this,2,'hist')" style="ime-mode:disabled">
+        <input type="password" maxlength="1" oninput="pinNav(this,3,'hist')" style="ime-mode:disabled">
+      </div>
+      <div id="pin-err-hist" class="alert alert-err hidden">PIN incorrecto.</div>
+      <div style="margin-top:12px">
+        <button class="btn primary" onclick="checkPin('hist')"><i class="ti ti-lock-open"></i> Ingresar</button>
+      </div>
+      <div style="margin-top:10px;font-size:12px;color:var(--muted)">Sin PIN configurado: configúralo en <b>Config</b>.</div>
+    </div>
+  </div>
+
+  <div id="hist-content-wrap" class="hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <span style="font-size:13px;color:var(--muted)">Registro de pedidos</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn" onclick="lockHist()"><i class="ti ti-lock"></i> Bloquear</button>
+        <button class="btn danger" onclick="limpiarHistorial()"><i class="ti ti-trash"></i> Limpiar</button>
+      </div>
+    </div>
+    <div class="section" id="hist-tabla">
+      <div class="empty"><i class="ti ti-inbox" style="font-size:36px;display:block;margin-bottom:8px;color:#ccc"></i>Aún no hay pedidos</div>
+    </div>
+    <div class="totales-grid hidden" id="hist-totales">
+      <div class="result-card"><div class="result-label">Total facturado</div><div class="result-val" id="ht-facturado">S/ 0</div></div>
+      <div class="result-card"><div class="result-label">Total ganancia</div><div class="result-val" id="ht-ganancia">S/ 0</div></div>
+      <div class="result-card"><div class="result-label">Pedidos</div><div class="result-val" id="ht-pedidos">0</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== FILAMENTOS ===================== -->
+<div id="tab-filamentos" class="hidden">
+  <div class="section">
+    <div class="section-title"><i class="ti ti-needle-thread" aria-hidden="true"></i> Gestión de filamentos</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Edita nombres y precios, agrega o elimina filamentos. Los cambios se reflejan en la calculadora.</div>
+    <div style="display:grid;grid-template-columns:2fr 1fr auto;gap:8px;padding:0 0 6px;border-bottom:1px solid var(--border)">
+      <span style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Filamento</span>
+      <span style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">S/·kg</span>
+      <span></span>
+    </div>
+    <div id="fil-manager-list"></div>
+    <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+      <input type="text" id="new-fil-nombre" placeholder="Nombre del filamento" style="flex:2"/>
+      <input type="number" id="new-fil-precio" placeholder="Precio S/kg" style="flex:1" min="1"/>
+      <button class="btn primary" onclick="addFilamento()"><i class="ti ti-plus"></i> Agregar</button>
+    </div>
+    <div id="fil-alert" class="hidden" style="margin-top:8px"></div>
+  </div>
+</div>
+
+<!-- ===================== CONFIGURACIÓN ===================== -->
+<div id="tab-cfg" class="hidden">
+  <div class="section">
+    <div class="section-title"><i class="ti ti-lock" aria-hidden="true"></i> PIN del historial
+      <span id="pin-cfg-badge" class="pin-badge" style="display:none;margin-left:auto">Activo</span>
+    </div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:12px">El historial muestra tu ganancia y margen real. Protégelo con un PIN de 4 dígitos.</div>
+    <div class="row">
+      <div class="field"><label>PIN actual (dejar vacío si no hay)</label><input type="password" id="cfg-pin-actual" maxlength="4" placeholder="••••"/></div>
+      <div class="field"><label>Nuevo PIN (4 dígitos)</label><input type="number" id="cfg-pin-nuevo" maxlength="4" placeholder="0000"/></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn primary" onclick="guardarPin()"><i class="ti ti-check"></i> Guardar PIN</button>
+      <button class="btn danger" onclick="borrarPin()"><i class="ti ti-x"></i> Quitar PIN</button>
+    </div>
+    <div id="pin-cfg-alert" class="hidden" style="margin-top:8px"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="ti ti-printer" aria-hidden="true"></i> Costo por hora — Elegoo CC2</div>
+    <div class="row">
+      <div class="field"><label>Precio impresora (S/)</label><input type="number" id="cfg-precio" value="2299" oninput="recalcularCostoHora()"/></div>
+      <div class="field"><label>Vida útil (horas)</label><input type="number" id="cfg-vida" value="5000" oninput="recalcularCostoHora()"/></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Electricidad S/·kWh (Perú ≈ 0.60)</label><input type="number" id="cfg-kwh" value="0.60" step="0.01" oninput="recalcularCostoHora()"/></div>
+      <div class="field"><label>Consumo impresora (kW)</label><input type="number" id="cfg-kw" value="0.35" step="0.01" oninput="recalcularCostoHora()"/></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Mantenimiento S/·mes</label><input type="number" id="cfg-mant" value="30" oninput="recalcularCostoHora()"/></div>
+      <div class="field"><label>Costo nozzle (S/)</label><input type="number" id="cfg-nozzle" value="25" oninput="recalcularCostoHora()"/></div>
+    </div>
+    <div class="field" style="margin-bottom:0"><label>Vida útil nozzle (horas)</label><input type="number" id="cfg-nozzle-vida" value="300" oninput="recalcularCostoHora()"/></div>
+    <div class="cfg-result">
+      <span>Costo calculado por hora</span>
+      <span class="cfg-result-val" id="cfg-costo-hora-calc">S/ 1.200</span>
+    </div>
+    <div class="btn-row" style="margin-top:12px">
+      <button class="btn primary" onclick="aplicarCostoHora()"><i class="ti ti-check"></i> Aplicar a calculadora</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- .app -->
+
+<script>
+/* ==================== ESTADO ==================== */
+let margen = 0.45;
+let historial = [];
+let pinHash = localStorage.getItem('cc2_pin') || '';
+let histUnlocked = false;
+let colorRows = [];
+
+const FILAMENTOS_DEFAULT = [
+  {nombre:'PLA', precio:65},
+  {nombre:'PLA-CF', precio:120},
+  {nombre:'PETG', precio:75},
+  {nombre:'PETG-CF', precio:140},
+  {nombre:'ABS', precio:70},
+  {nombre:'ASA', precio:85},
+  {nombre:'TPU 95A', precio:95},
+  {nombre:'PA Nylon', precio:130},
+  {nombre:'PA-CF', precio:180},
+  {nombre:'PAHT-CF', precio:220},
+  {nombre:'PC', precio:160},
+  {nombre:'PET-CF', precio:150},
+];
+
+let filamentos = JSON.parse(localStorage.getItem('cc2_filamentos') || 'null') || JSON.parse(JSON.stringify(FILAMENTOS_DEFAULT));
+
+/* ==================== UTILS ==================== */
+function g(id){return parseFloat(document.getElementById(id).value)||0;}
+function fmt(v){return 'S/ '+v.toFixed(2);}
+function simpleHash(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0;}return h.toString();}
+function saveFilamentos(){localStorage.setItem('cc2_filamentos',JSON.stringify(filamentos));}
+
+/* ==================== TABS ==================== */
+function showTab(t, btn){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('[id^="tab-"]').forEach(d=>d.classList.add('hidden'));
+  document.getElementById('tab-'+t).classList.remove('hidden');
+  btn.classList.add('active');
+  if(t==='hist') initHist();
+  if(t==='filamentos') renderFilManager();
+  if(t==='cfg') initCfg();
+}
+
+/* ==================== FILAMENTOS ==================== */
+function buildFilSelect(){
+  const sel=document.getElementById('filamento');
+  if(!sel)return;
+  const prev=sel.value;
+  sel.innerHTML='';
+  filamentos.forEach((f,i)=>{
+    const opt=document.createElement('option');
+    opt.value=i;
+    opt.textContent=f.nombre+' — S/'+f.precio+'/kg';
+    sel.appendChild(opt);
+  });
+  if(prev!==''&&prev<filamentos.length) sel.value=prev;
+  actualizarPrecioFil();
+  buildColorSelects();
+}
+
+function actualizarPrecioFil(){
+  const sel=document.getElementById('filamento');
+  if(!sel||sel.selectedIndex<0)return;
+  const idx=parseInt(sel.value)||0;
+  document.getElementById('precio-fil').value=filamentos[idx]?.precio||65;
+  calcular();
+}
+
+function renderFilManager(){
+  const list=document.getElementById('fil-manager-list');
+  if(filamentos.length===0){list.innerHTML='<div class="empty">Sin filamentos. Agrega uno.</div>';return;}
+  list.innerHTML=filamentos.map((f,i)=>`
+    <div class="fil-row" id="filrow-${i}">
+      <input type="text" value="${f.nombre}" onchange="editFil(${i},'nombre',this.value)" style="font-weight:500"/>
+      <input type="number" value="${f.precio}" min="1" onchange="editFil(${i},'precio',this.value)" style="text-align:right"/>
+      <button class="icon-btn" onclick="deleteFil(${i})" title="Eliminar"><i class="ti ti-trash" style="font-size:14px"></i></button>
+    </div>
+  `).join('');
+}
+
+function editFil(i,key,val){
+  filamentos[i][key]=key==='precio'?(parseFloat(val)||0):val;
+  saveFilamentos();
+  buildFilSelect();
+}
+
+function deleteFil(i){
+  if(filamentos.length<=1){showFilAlert('Debe quedar al menos un filamento.','err');return;}
+  showConfirm(`¿Eliminar "${filamentos[i].nombre}"?`, ()=>{
+    filamentos.splice(i,1);
+    saveFilamentos();
+    buildFilSelect();
+    renderFilManager();
+  });
+}
+
+function addFilamento(){
+  const nombre=document.getElementById('new-fil-nombre').value.trim();
+  const precio=parseFloat(document.getElementById('new-fil-precio').value)||0;
+  if(!nombre){showFilAlert('Ingresa un nombre.','err');return;}
+  if(precio<=0){showFilAlert('Ingresa un precio válido.','err');return;}
+  filamentos.push({nombre,precio});
+  saveFilamentos();
+  document.getElementById('new-fil-nombre').value='';
+  document.getElementById('new-fil-precio').value='';
+  buildFilSelect();
+  renderFilManager();
+  showFilAlert(`"${nombre}" agregado correctamente.`,'ok');
+}
+
+function showFilAlert(msg,type){
+  const el=document.getElementById('fil-alert');
+  el.className='alert '+(type==='err'?'alert-err':'alert-ok');
+  el.textContent=msg;
+  el.classList.remove('hidden');
+  setTimeout(()=>el.classList.add('hidden'),3000);
+}
+
+/* ==================== MULTICOLOR ==================== */
+function toggleMulticolor(){
+  const on=document.getElementById('multicolor-toggle').checked;
+  document.getElementById('modo-unico').classList.toggle('hidden',on);
+  document.getElementById('modo-multi').classList.toggle('hidden',!on);
+  if(on&&colorRows.length===0) addColorRow();
+  calcular();
+}
+
+function buildColorSelects(){
+  document.querySelectorAll('.color-fil-select').forEach(sel=>{
+    const prev=sel.value;
+    sel.innerHTML=filamentos.map((f,i)=>`<option value="${i}">${f.nombre}</option>`).join('');
+    if(prev!==''&&prev<filamentos.length) sel.value=prev;
+  });
+}
+
+function addColorRow(){
+  if(colorRows.length>=4)return;
+  const id='cr'+Date.now();
+  colorRows.push(id);
+  const list=document.getElementById('color-list');
+  const n=colorRows.length;
+  const row=document.createElement('div');
+  row.className='color-row';
+  row.id=id;
+  row.innerHTML=`
+    <div class="field color-fil-col" style="grid-column:1/-1;margin-bottom:-4px">
+      <label>Color ${n} — Filamento</label>
+      <select class="color-fil-select" data-id="${id}" onchange="calcular()">
+        ${filamentos.map((f,i)=>`<option value="${i}">${f.nombre}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field"><label>Gramos</label><input type="number" class="color-gramos" value="20" min="1" oninput="calcular()"/></div>
+    <div class="field"><label>Precio S/·kg</label><input type="number" class="color-precio" value="${filamentos[0]?.precio||65}" min="1" oninput="calcular()"/></div>
+    <div style="align-self:end">
+      <button class="icon-btn" onclick="removeColorRow('${id}')" title="Quitar"><i class="ti ti-x" style="font-size:14px"></i></button>
+    </div>
+  `;
+  row.querySelector('.color-fil-select').addEventListener('change',function(){
+    const idx=parseInt(this.value)||0;
+    row.querySelector('.color-precio').value=filamentos[idx]?.precio||65;
+    calcular();
+  });
+  list.appendChild(row);
+  document.getElementById('add-color-btn').style.display=colorRows.length>=4?'none':'flex';
+  calcular();
+}
+
+function removeColorRow(id){
+  const idx=colorRows.indexOf(id);
+  if(idx>-1) colorRows.splice(idx,1);
+  document.getElementById(id)?.remove();
+  document.getElementById('add-color-btn').style.display='flex';
+  if(colorRows.length===0) addColorRow();
+  calcular();
+}
+
+/* ==================== PINTADO ==================== */
+function togglePintado(){
+  const on=document.getElementById('pintado-toggle').checked;
+  document.getElementById('pintado-detalle').classList.toggle('hidden',!on);
+  calcular();
+}
+
+/* ==================== DISEÑO ==================== */
+function toggleDiseno(){
+  const tipo=document.getElementById('tipo-diseno').value;
+  document.getElementById('campo-horas-diseno').style.display=tipo==='propio'?'':'none';
+  document.getElementById('campo-tarifa').style.display=tipo==='sin'?'none':'';
+  const tarLabel=document.querySelector('#campo-tarifa .field:first-child');
+  const tarInput=document.querySelector('#campo-tarifa .field:first-child input');
+  if(tarLabel&&tarInput){
+    tarLabel.style.display=tipo==='descargado'?'none':'';
+    tarInput.style.display=tipo==='descargado'?'none':'';
+  }
+  document.getElementById('campo-costo-desc').style.display=tipo==='descargado'?'':'none';
+  calcular();
+}
+
+/* ==================== CALCULAR ==================== */
+function setMargen(v,btn){
+  margen=v;
+  document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  calcular();
+}
+
+function calcular(){
+  if(document.getElementById('modo-piezas-toggle')?.checked){ calcularPiezas(); return; }
+  const piezas=Math.max(1,g('piezas'));
+  const multi=document.getElementById('multicolor-toggle').checked;
+
+  let cFil=0;
+  if(!multi){
+    const precioFil=g('precio-fil'), gramos=g('gramos'), desp=g('desperdicio')/100;
+    cFil=(precioFil/1000)*gramos*(1+desp);
+  } else {
+    const desp=g('desperdicio-multi')/100;
+    document.querySelectorAll('.color-row').forEach(row=>{
+      const g2=parseFloat(row.querySelector('.color-gramos')?.value)||0;
+      const p=parseFloat(row.querySelector('.color-precio')?.value)||0;
+      cFil+=(p/1000)*g2*(1+desp);
+    });
+  }
+
+  const cMaq=g('horas')*g('costo-hora');
+
+  const tipo=document.getElementById('tipo-diseno').value;
+  let cDis=0;
+  if(tipo==='propio') cDis=g('horas-diseno')*g('tarifa-diseno');
+  else if(tipo==='descargado') cDis=g('costo-desc');
+
+  const cLij=g('lijado');
+  let cPint=g('pintado-mano');
+  const pintadoOn=document.getElementById('pintado-toggle').checked;
+  let cPintura=0;
+  if(pintadoOn){
+    cPintura=(g('pintura-precio')/100)*g('pintura-ml');
+    document.getElementById('pintura-costo-calc').value=cPintura.toFixed(2);
+    cPint+=cPintura;
+  }
+  const cExt=g('envio')+g('urgencia')+g('otros');
+
+  const base=cFil+cMaq+cDis+cLij+cPint+cExt;
+  const gan=base*margen;
+  const precioXpieza=base+gan;
+  const precioTotal=precioXpieza*piezas;
+  const redondeado=Math.ceil(precioTotal/5)*5;
+  const ganNeta=redondeado-(base*piezas);
+  const margenReal=redondeado>0?(ganNeta/redondeado)*100:0;
+
+  document.getElementById('precio-final').textContent=fmt(redondeado);
+
+  document.getElementById('d-fil').textContent=fmt(cFil);
+  document.getElementById('d-maq').textContent=fmt(cMaq);
+  document.getElementById('d-dis').textContent=fmt(cDis);
+  document.getElementById('d-lij').textContent=fmt(cLij);
+  document.getElementById('d-pin').textContent=fmt(cPint)+(pintadoOn?` (pintura: S/ ${cPintura.toFixed(2)})`:'');
+  document.getElementById('d-ext').textContent=fmt(cExt);
+  document.getElementById('d-base').textContent=fmt(base);
+  document.getElementById('d-gan').textContent=fmt(gan);
+  document.getElementById('d-pct').textContent=Math.round(margen*100);
+  document.getElementById('d-pieza').textContent=fmt(precioXpieza);
+  document.getElementById('d-piezas2').textContent=piezas;
+  document.getElementById('d-total').textContent=fmt(redondeado);
+
+  window._lastCalc={redondeado,ganNeta,margenReal,base,piezas,cFil,cMaq,cDis,cLij,cPint,cPintura,cExt};
+}
+
+/* ==================== DESGLOSE TOGGLE ==================== */
+function toggleDesglose(){
+  const d=document.getElementById('desglose');
+  const icon=document.getElementById('chev-icon');
+  const lbl=document.getElementById('desglose-lbl');
+  if(d.classList.contains('hidden')){
+    d.classList.remove('hidden');icon.className='ti ti-chevron-up';lbl.textContent='Ocultar desglose';
+  } else {
+    d.classList.add('hidden');icon.className='ti ti-chevron-down';lbl.textContent='Ver desglose de costos';
+  }
+}
+
+/* ==================== HISTORIAL ==================== */
+function initHist(){
+  const locked=document.getElementById('hist-locked');
+  const wrap=document.getElementById('hist-content-wrap');
+  if(!pinHash||histUnlocked){
+    locked.classList.add('hidden');
+    wrap.classList.remove('hidden');
+    renderHistorial();
+  } else {
+    locked.classList.remove('hidden');
+    wrap.classList.add('hidden');
+    document.querySelectorAll('#pin-input-hist input').forEach(i=>i.value='');
+    document.getElementById('pin-err-hist').classList.add('hidden');
+  }
+}
+
+function pinNav(el,idx,scope){
+  if(el.value.length>=1){
+    const inputs=document.querySelectorAll(`#pin-input-${scope} input`);
+    if(idx<3) inputs[idx+1].focus();
+    else checkPin(scope);
+  }
+}
+
+function checkPin(scope){
+  const inputs=document.querySelectorAll(`#pin-input-${scope} input`);
+  const entered=Array.from(inputs).map(i=>i.value).join('');
+  if(simpleHash(entered)===pinHash||!pinHash){
+    histUnlocked=true;
+    document.getElementById('hist-locked').classList.add('hidden');
+    document.getElementById('hist-content-wrap').classList.remove('hidden');
+    renderHistorial();
+  } else {
+    document.getElementById('pin-err-hist').classList.remove('hidden');
+    inputs.forEach(i=>i.value='');
+    inputs[0].focus();
+  }
+}
+
+function lockHist(){
+  histUnlocked=false;
+  initHist();
+}
+
+function renderHistorial(){
+  const tabla=document.getElementById('hist-tabla');
+  const tot=document.getElementById('hist-totales');
+  if(historial.length===0){
+    tabla.innerHTML='<div class="empty"><i class="ti ti-inbox" style="font-size:36px;display:block;margin-bottom:8px;color:#ccc"></i>Aún no hay pedidos guardados</div>';
+    tot.classList.add('hidden');return;
+  }
+  let totalFac=0,totalGan=0;
+  let rows=historial.map((p,i)=>{
+    const precio=parseFloat(p.precio.replace('S/ ',''))||0;
+    const gan=parseFloat(p.ganancia.replace('S/ ',''))||0;
+    totalFac+=precio;totalGan+=gan;
+    const badge=p.estado==='Entregado'
+      ?`<span class="badge badge-ok">Entregado</span>`
+      :`<span class="badge badge-pend" onclick="marcarEntregado(${i})" title="Clic para marcar como entregado">Pendiente</span>`;
+    return `<tr>
+      <td>${p.fecha}</td>
+      <td><strong>${p.cliente}</strong></td>
+      <td>${p.filNombre}</td>
+      <td style="text-align:center">${p.piezas}</td>
+      <td style="text-align:right;font-weight:600">${p.precio}</td>
+      <td style="text-align:right;color:var(--green);font-weight:600">${p.ganancia}</td>
+      <td style="text-align:right;color:var(--accent);font-weight:600">${p.margenReal}</td>
+      <td>${badge}</td>
+      <td style="display:flex;gap:4px;align-items:center">
+        <button class="icon-btn" onclick="generarPDFHistorial(${i})" title="Generar cotización PDF" style="width:28px;height:28px;background:#eef0ff;color:#1a1830;border-color:#c0c8f0"><i class="ti ti-file-invoice" style="font-size:13px"></i></button>
+        <button class="icon-btn" onclick="deletePedido(${i})" title="Eliminar pedido" style="width:28px;height:28px"><i class="ti ti-trash" style="font-size:13px"></i></button>
+      </td>
+    </tr>`;
+  }).join('');
+  tabla.innerHTML=`<div style="overflow-x:auto"><table class="htable">
+    <thead><tr>
+      <th>Fecha</th><th>Cliente</th><th>Filamento</th><th>Pzs</th>
+      <th style="text-align:right">Precio</th>
+      <th style="text-align:right">Ganancia</th>
+      <th style="text-align:right">Margen</th>
+      <th>Estado</th>
+      <th></th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+  document.getElementById('ht-facturado').textContent='S/ '+totalFac.toFixed(2);
+  document.getElementById('ht-ganancia').textContent='S/ '+totalGan.toFixed(2);
+  document.getElementById('ht-pedidos').textContent=historial.length;
+  tot.classList.remove('hidden');
+}
+
+function marcarEntregado(i){historial[i].estado='Entregado';renderHistorial();}
+
+function deletePedido(i){
+  showConfirm('¿Eliminar este pedido de "'+historial[i].cliente+'"?', ()=>{
+    historial.splice(i,1);
+    renderHistorial();
+  });
+}
+
+function limpiarHistorial(){
+  if(historial.length===0)return;
+  showConfirm('¿Borrar todo el historial? Esta acción no se puede deshacer.', ()=>{
+    historial=[];renderHistorial();
+  }, 'Borrar todo');
+}
+
+function guardarPedido(){
+  const c=window._lastCalc;
+  if(!c)return;
+  const cliente=document.getElementById('cliente').value||'Sin nombre';
+  const multi=document.getElementById('multicolor-toggle').checked;
+  let filNombre;
+  if(multi){
+    const nombres=[...document.querySelectorAll('.color-fil-select')].map(s=>filamentos[parseInt(s.value)||0]?.nombre||'?');
+    filNombre=nombres.join(' + ');
+  } else {
+    const sel=document.getElementById('filamento');
+    filNombre=filamentos[parseInt(sel.value)||0]?.nombre||'?';
+  }
+  const fecha=new Date().toLocaleDateString('es-PE');
+  const fmtH = v => v>0 ? 'S/ '+v.toFixed(2) : 'S/ 0.00';
+  const pintadoOnH = document.getElementById('pintado-toggle').checked;
+  const extrasH = [];
+  if(parseFloat(document.getElementById('lijado').value)>0) extrasH.push('Lijado');
+  if(pintadoOnH) extrasH.push('Pintado');
+  if(parseFloat(document.getElementById('envio').value)>0) extrasH.push('Envío');
+  if(parseFloat(document.getElementById('urgencia').value)>0) extrasH.push('Servicio urgente');
+  const tipoH = document.getElementById('tipo-diseno').options[document.getElementById('tipo-diseno').selectedIndex].text;
+  historial.push({
+    fecha,cliente,filNombre,
+    piezas:c.piezas,
+    precio:fmt(c.redondeado),
+    ganancia:fmt(c.ganNeta),
+    margenReal:c.margenReal.toFixed(1)+'%',
+    estado:'Pendiente',
+    tipo:tipoH, extras:extrasH,
+    dFil:fmtH(c.cFil), dMaq:fmtH(c.cMaq), dDis:fmtH(c.cDis),
+    dLij:fmtH(c.cLij), dPin:fmtH(c.cPint), dExt:fmtH(c.cExt), dBase:fmtH(c.base)
+  });
+  const btn=event.target.closest('button');
+  const orig=btn.innerHTML;
+  btn.innerHTML='<i class="ti ti-check"></i> Guardado';
+  btn.style.background='var(--green)';
+  setTimeout(()=>{btn.innerHTML=orig;btn.style.background='';},1800);
+}
+
+/* ==================== LIMPIAR ==================== */
+function limpiarFormulario(){
+  document.getElementById('cliente').value='Mi Proyecto';
+  document.getElementById('piezas').value=1;
+  document.getElementById('gramos').value=50;
+  document.getElementById('desperdicio').value=10;
+  document.getElementById('horas').value=3.5;
+  document.getElementById('lijado').value=0;
+  document.getElementById('pintado-mano').value=0;
+  document.getElementById('pintado-toggle').checked=false;
+  togglePintado();
+  document.getElementById('envio').value=0;
+  document.getElementById('urgencia').value=0;
+  document.getElementById('otros').value=0;
+  document.getElementById('horas-diseno').value=2;
+  document.getElementById('tipo-diseno').value='propio';
+  document.getElementById('multicolor-toggle').checked=false;
+  colorRows=[];
+  document.getElementById('color-list').innerHTML='';
+  toggleMulticolor();
+  toggleDiseno();
+  calcular();
+}
+
+/* ==================== PIN CONFIG ==================== */
+function initCfg(){
+  const badge=document.getElementById('pin-cfg-badge');
+  const statusBadge=document.getElementById('pin-status-badge');
+  if(pinHash){
+    badge.style.display='inline';
+    statusBadge.style.display='inline';
+  } else {
+    badge.style.display='none';
+    statusBadge.style.display='none';
+  }
+}
+
+function guardarPin(){
+  const actual=document.getElementById('cfg-pin-actual').value;
+  const nuevo=document.getElementById('cfg-pin-nuevo').value;
+  if(pinHash&&simpleHash(actual)!==pinHash){
+    showPinAlert('PIN actual incorrecto.','err');return;
+  }
+  if(!/^\d{4}$/.test(nuevo)){
+    showPinAlert('El PIN debe tener exactamente 4 dígitos.','err');return;
+  }
+  pinHash=simpleHash(nuevo);
+  localStorage.setItem('cc2_pin',pinHash);
+  histUnlocked=false;
+  document.getElementById('cfg-pin-actual').value='';
+  document.getElementById('cfg-pin-nuevo').value='';
+  showPinAlert('PIN guardado correctamente.','ok');
+  initCfg();
+}
+
+function borrarPin(){
+  if(pinHash){
+    const actual=document.getElementById('cfg-pin-actual').value;
+    if(simpleHash(actual)!==pinHash){showPinAlert('PIN actual incorrecto.','err');return;}
+  }
+  pinHash='';
+  localStorage.removeItem('cc2_pin');
+  histUnlocked=true;
+  document.getElementById('cfg-pin-actual').value='';
+  document.getElementById('pin-status-badge').style.display='none';
+  document.getElementById('pin-cfg-badge').style.display='none';
+  showPinAlert('PIN eliminado.','ok');
+}
+
+function showPinAlert(msg,type){
+  const el=document.getElementById('pin-cfg-alert');
+  el.className='alert '+(type==='err'?'alert-err':'alert-ok');
+  el.textContent=msg;
+  el.classList.remove('hidden');
+  setTimeout(()=>el.classList.add('hidden'),3000);
+}
+
+/* ==================== CFG HORA ==================== */
+function recalcularCostoHora(){
+  const precio=g('cfg-precio'),vida=g('cfg-vida')||1;
+  const kwh=g('cfg-kwh'),kw=g('cfg-kw');
+  const mant=g('cfg-mant'),nozzle=g('cfg-nozzle'),nVida=g('cfg-nozzle-vida')||1;
+  const total=(precio/vida)+(kwh*kw)+(nozzle/nVida)+(mant/160);
+  document.getElementById('cfg-costo-hora-calc').textContent='S/ '+total.toFixed(3);
+}
+
+function aplicarCostoHora(){
+  const precio=g('cfg-precio'),vida=g('cfg-vida')||1;
+  const kwh=g('cfg-kwh'),kw=g('cfg-kw');
+  const mant=g('cfg-mant'),nozzle=g('cfg-nozzle'),nVida=g('cfg-nozzle-vida')||1;
+  const total=(precio/vida)+(kwh*kw)+(nozzle/nVida)+(mant/160);
+  document.getElementById('costo-hora').value=total.toFixed(3);
+  showTab('calc',document.querySelectorAll('.tab')[0]);
+  calcular();
+}
+
+/* ==================== MODO PIEZAS INDIVIDUALES ==================== */
+let piezasRows = [];
+
+function toggleModoPiezas(){
+  const on = document.getElementById('modo-piezas-toggle').checked;
+  document.getElementById('datos-normal').classList.toggle('hidden', on);
+  document.getElementById('datos-piezas-cliente').classList.toggle('hidden', !on);
+  document.getElementById('seccion-piezas-ind').classList.toggle('hidden', !on);
+  document.getElementById('seccion-fil-normal').classList.toggle('hidden', on);
+  document.getElementById('seccion-tiempo-normal').classList.toggle('hidden', on);
+  if(on && piezasRows.length === 0){
+    addPiezaRow();
+    addPiezaRow();
+  }
+  calcular();
+}
+
+function addPiezaRow(){
+  const id = 'pr' + Date.now();
+  piezasRows.push(id);
+  const list = document.getElementById('piezas-list');
+  const n = piezasRows.length;
+  const filOpts = filamentos.map((f,i) => '<option value="'+i+'">'+f.nombre+'</option>').join('');
+  const div = document.createElement('div');
+  div.className = 'pieza-row';
+  div.id = id;
+  div.innerHTML =
+    '<div class="field"><label>Pieza '+n+'</label><input type="text" value="Pieza '+n+'" style="font-weight:500" oninput="calcularPiezas()"/></div>'+
+    '<div class="field"><label>Gramos</label><input type="number" class="pi-gramos" value="20" min="0" step="0.1" oninput="calcularPiezas()"/></div>'+
+    '<div class="field"><label>Horas</label><input type="number" class="pi-horas" value="0" min="0" step="1" oninput="calcularPiezas()"/></div>'+
+    '<div class="field"><label>Min</label><input type="number" class="pi-mins" value="30" min="0" max="59" step="1" oninput="calcularPiezas()"/></div>'+
+    '<div><label style="font-size:11px;color:var(--muted);font-weight:500">Precio</label><div class="pieza-precio" id="pp-'+id+'">S/ 0.00</div></div>'+
+    '<div style="align-self:end"><button class="icon-btn" data-rowid="'+id+'" onclick="removePiezaRow(this.dataset.rowid)" title="Eliminar"><i class="ti ti-trash" style="font-size:13px"></i></button></div>';
+  list.appendChild(div);
+  calcularPiezas();
+}
+
+function removePiezaRow(id){
+  if(piezasRows.length <= 1){showFilAlert('Debe quedar al menos una pieza.','err');return;}
+  const idx = piezasRows.indexOf(id);
+  if(idx > -1) piezasRows.splice(idx, 1);
+  document.getElementById(id)?.remove();
+  calcularPiezas();
+}
+
+function calcularPiezas(){
+  if(!document.getElementById('modo-piezas-toggle').checked) return;
+  const costoHora = g('costo-hora');
+  const precioFil = filamentos[parseInt(document.getElementById('filamento').value)||0]?.precio || g('precio-fil');
+  const desp = g('desperdicio') / 100;
+  const tipo = document.getElementById('tipo-diseno').value;
+  let cDis = 0;
+  if(tipo==='propio') cDis = g('horas-diseno') * g('tarifa-diseno');
+  else if(tipo==='descargado') cDis = g('costo-desc');
+  const cLij = g('lijado');
+  let cPint = g('pintado-mano');
+  if(document.getElementById('pintado-toggle').checked){
+    cPint += (g('pintura-precio')/100) * g('pintura-ml');
+  }
+  const cExt = g('envio') + g('urgencia') + g('otros');
+
+  let totalGramos = 0, totalHoras = 0;
+  const rows = document.querySelectorAll('#piezas-list .pieza-row');
+  rows.forEach(row => {
+    totalGramos += parseFloat(row.querySelector('.pi-gramos')?.value)||0;
+    const hh = parseFloat(row.querySelector('.pi-horas')?.value)||0;
+    const mm = parseFloat(row.querySelector('.pi-mins')?.value)||0;
+    totalHoras += hh + mm/60;
+  });
+
+  let totalConjunto = 0;
+  rows.forEach(row => {
+    const gr = parseFloat(row.querySelector('.pi-gramos')?.value)||0;
+    const _hh = parseFloat(row.querySelector('.pi-horas')?.value)||0;
+    const _mm = parseFloat(row.querySelector('.pi-mins')?.value)||0;
+    const hs = _hh + _mm/60;
+    const id = row.id;
+
+    const cFilP = (precioFil/1000) * gr * (1+desp);
+    const cMaqP = hs * costoHora;
+
+    const propHoras = totalHoras > 0 ? hs / totalHoras : 1 / rows.length;
+    const cDisP = cDis * propHoras;
+    const cLijP = cLij * propHoras;
+    const cPintP = cPint * propHoras;
+    const cExtP = cExt * propHoras;
+
+    const base = cFilP + cMaqP + cDisP + cLijP + cPintP + cExtP;
+    const precio = base * (1 + margen);
+    const redondeado = Math.ceil(precio / 5) * 5;
+    totalConjunto += redondeado;
+
+    const el = document.getElementById('pp-'+id);
+    if(el) el.textContent = 'S/ ' + redondeado.toFixed(2);
+  });
+
+  document.getElementById('piezas-total-val').textContent = 'S/ ' + totalConjunto.toFixed(2);
+  document.getElementById('precio-final').textContent = 'S/ ' + totalConjunto.toFixed(2);
+
+  const piezasData = [];
+  rows.forEach(row => {
+    const nombre = row.querySelector('input[type="text"]')?.value || 'Pieza';
+    const gr = parseFloat(row.querySelector('.pi-gramos')?.value)||0;
+    const hh2 = parseFloat(row.querySelector('.pi-horas')?.value)||0;
+    const mm2 = parseFloat(row.querySelector('.pi-mins')?.value)||0;
+    const precio_p = row.querySelector('.pieza-precio')?.textContent || 'S/ 0.00';
+    const tiempoStr = (hh2>0?hh2+'h ':'')+(mm2>0?mm2+'min':'');
+    piezasData.push({nombre, gr, tiempoStr: tiempoStr||'0min', precio: precio_p});
+  });
+
+  window._lastCalc = {
+    redondeado: totalConjunto, ganNeta: totalConjunto * margen / (1+margen),
+    margenReal: margen*100, base: totalConjunto/(1+margen),
+    cFil:0, cMaq:0, cDis:cDis, cLij:cLij, cPint:cPint, cPintura:0, cExt:cExt,
+    piezas: rows.length, piezasData: piezasData, modoPiezas: true
+  };
+}
+
+/* ==================== CONFIRM MODAL ==================== */
+let _confirmCb=null;
+function showConfirm(msg,cb,okLabel){
+  _confirmCb=cb;
+  document.getElementById('confirm-msg').textContent=msg;
+  const okBtn=document.getElementById('confirm-ok-btn');
+  okBtn.innerHTML='<i class="ti ti-trash"></i> '+(okLabel||'Eliminar');
+  document.getElementById('confirm-overlay').style.display='flex';
+}
+function closeConfirm(){
+  document.getElementById('confirm-overlay').style.display='none';
+  _confirmCb=null;
+}
+function confirmOk(){
+  if(_confirmCb) _confirmCb();
+  closeConfirm();
+}
+
+/* ==================== PDF COTIZACIÓN ==================== */
+function generarCotizacionPDF(){
+  const c = window._lastCalc;
+  if(!c || c.redondeado===0){alert('Primero completa el cálculo.');return;}
+  const modoPiezas = document.getElementById('modo-piezas-toggle').checked;
+  const cliente = document.getElementById('cliente').value || 'Cliente';
+  const fecha = new Date().toLocaleDateString('es-PE');
+  const nCot = 'COT-'+Date.now().toString().slice(-6);
+  const fmt2 = v => (v||0)>0 ? 'S/ '+(v||0).toFixed(2) : 'S/ 0.00';
+
+  if(modoPiezas){
+    imprimirCotizacion({
+      nCot, fecha, cliente,
+      filNombre: filamentos[parseInt(document.getElementById('filamento').value)||0]?.nombre || 'PLA',
+      piezas: c.piezas, tipo: '—', extras: [],
+      precio: c.redondeado, estado: 'Pendiente',
+      dFil: fmt2(c.cFil), dMaq: fmt2(c.cMaq), dDis: fmt2(c.cDis),
+      dLij: fmt2(c.cLij), dPin: fmt2(c.cPint), dExt: fmt2(c.cExt),
+      dBase: fmt2(c.base),
+      modoPiezas: true,
+      piezasData: c.piezasData || []
+    });
+    return;
+  }
+
+  const multi = document.getElementById('multicolor-toggle').checked;
+  let filNombre;
+  if(multi){
+    filNombre = [...document.querySelectorAll('.color-fil-select')].map(s=>filamentos[parseInt(s.value)||0]?.nombre||'?').join(' + ');
+  } else {
+    const sel = document.getElementById('filamento');
+    filNombre = filamentos[parseInt(sel.value)||0]?.nombre || '?';
+  }
+  const tipo = document.getElementById('tipo-diseno').options[document.getElementById('tipo-diseno').selectedIndex].text;
+  const pintadoOn = document.getElementById('pintado-toggle').checked;
+  const extras = [];
+  if(parseFloat(document.getElementById('lijado').value)>0) extras.push('Lijado');
+  if(pintadoOn) extras.push('Pintado');
+  if(parseFloat(document.getElementById('envio').value)>0) extras.push('Envío');
+  if(parseFloat(document.getElementById('urgencia').value)>0) extras.push('Servicio urgente');
+  imprimirCotizacion({
+    nCot, fecha, cliente, filNombre, piezas: c.piezas, tipo, extras,
+    precio: c.redondeado, estado: 'Pendiente',
+    dFil: fmt2(c.cFil), dMaq: fmt2(c.cMaq), dDis: fmt2(c.cDis),
+    dLij: fmt2(c.cLij), dPin: fmt2(c.cPint), dExt: fmt2(c.cExt),
+    dBase: fmt2(c.base), modoPiezas: false, piezasData: null
+  });
+}
+
+function generarPDFHistorial(i){
+  const p = historial[i];
+  const nCot = 'COT-'+String(i+1).padStart(4,'0');
+  imprimirCotizacion({
+    nCot, fecha:p.fecha, cliente:p.cliente, filNombre:p.filNombre,
+    piezas:p.piezas, tipo:p.tipo||'—', extras:p.extras||[],
+    precio:parseFloat(p.precio.replace('S/ ','')), estado:p.estado,
+    dFil:p.dFil||'—', dMaq:p.dMaq||'—', dDis:p.dDis||'—',
+    dLij:p.dLij||'—', dPin:p.dPin||'—', dExt:p.dExt||'—', dBase:p.dBase||'—'
+  });
+}
+
+function imprimirCotizacion(d){
+  const precioFmt = 'S/ ' + parseFloat(d.precio).toFixed(2);
+  const precioXPieza = d.piezas > 1 ? ('S/ ' + (d.precio / d.piezas).toFixed(2) + ' c/u') : '';
+
+  let tablaDetalle = '';
+  if(d.modoPiezas && d.piezasData && d.piezasData.length > 0){
+    tablaDetalle += '<tr style="background:#0d0d1a">';
+    tablaDetalle += '<td style="padding:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#c8a84b;width:40%">Pieza</td>';
+    tablaDetalle += '<td style="padding:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#aaa;text-align:center">Gramos</td>';
+    tablaDetalle += '<td style="padding:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#aaa;text-align:center">Tiempo</td>';
+    tablaDetalle += '<td style="padding:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#aaa;text-align:right">Precio</td>';
+    tablaDetalle += '</tr>';
+    d.piezasData.forEach(function(p, idx){
+      const bg = idx%2===0 ? '#fff' : '#f9f8f5';
+      tablaDetalle += '<tr style="background:'+bg+'">';
+      tablaDetalle += '<td style="padding:9px 8px;font-size:13px;font-weight:500;color:#0d0d1a;border-bottom:1px solid #f0ede4">' + p.nombre + '</td>';
+      tablaDetalle += '<td style="padding:9px 8px;font-size:13px;text-align:center;color:#555;border-bottom:1px solid #f0ede4">' + p.gr + 'g</td>';
+      tablaDetalle += '<td style="padding:9px 8px;font-size:13px;text-align:center;color:#555;border-bottom:1px solid #f0ede4">' + p.tiempoStr + '</td>';
+      tablaDetalle += '<td style="padding:9px 8px;font-size:13px;text-align:right;font-weight:700;color:#0f6e56;border-bottom:1px solid #f0ede4">' + p.precio + '</td>';
+      tablaDetalle += '</tr>';
+    });
+    tablaDetalle += '<tr style="background:#edfdf5">';
+    tablaDetalle += '<td style="padding:10px 8px;font-weight:700;font-size:14px;color:#0d0d1a" colspan="3">Total (' + d.piezasData.length + ' piezas)</td>';
+    tablaDetalle += '<td style="padding:10px 8px;font-weight:800;font-size:15px;text-align:right;color:#0f6e56">' + 'S/ ' + parseFloat(d.precio).toFixed(2) + '</td>';
+    tablaDetalle += '</tr>';
+  } else {
+    tablaDetalle += '<tr><td class="dl">Material / Filamento</td><td class="dr">' + (d.filNombre||'—') + '</td></tr>';
+    tablaDetalle += '<tr><td class="dl">Cantidad de piezas</td><td class="dr">' + d.piezas + (d.piezas===1?' pieza':' piezas') + '</td></tr>';
+    if(d.piezas > 1) tablaDetalle += '<tr><td class="dl">Precio unitario</td><td class="dr">' + precioXPieza + '</td></tr>';
+    tablaDetalle += '<tr><td class="dl">Tipo de diseño</td><td class="dr">' + (d.tipo||'—') + '</td></tr>';
+    if(d.extras && d.extras.length > 0) tablaDetalle += '<tr><td class="dl">Servicios adicionales</td><td class="dr">' + d.extras.join(', ') + '</td></tr>';
+  }
+
+  let tablaDesglose = '';
+  tablaDesglose += '<tr><td class="dl-sub">Costo de filamento(s)</td><td class="dr-sub">' + (d.dFil||'S/ 0.00') + '</td></tr>';
+  tablaDesglose += '<tr><td class="dl-sub">Costo de máquina</td><td class="dr-sub">' + (d.dMaq||'S/ 0.00') + '</td></tr>';
+  tablaDesglose += '<tr><td class="dl-sub">Diseño 3D</td><td class="dr-sub">' + (d.dDis||'S/ 0.00') + '</td></tr>';
+  tablaDesglose += '<tr><td class="dl-sub">Lijado</td><td class="dr-sub">' + (d.dLij||'S/ 0.00') + '</td></tr>';
+  tablaDesglose += '<tr><td class="dl-sub">Pintado</td><td class="dr-sub">' + (d.dPin||'S/ 0.00') + '</td></tr>';
+  tablaDesglose += '<tr><td class="dl-sub">Envío / urgencia / otros</td><td class="dr-sub">' + (d.dExt||'S/ 0.00') + '</td></tr>';
+  tablaDesglose += '<tr><td class="dl-total">Subtotal base</td><td class="dr-total">' + (d.dBase||'S/ 0.00') + '</td></tr>';
+
+  const badgeClass = d.estado === 'Entregado' ? 'badge-ok' : 'badge-pend';
+  const estadoLabel = d.estado || 'Pendiente';
+
+  const html =
+    '<style>' +
+    '#cot-print *{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",sans-serif}' +
+    '#cot-print{background:#fff;width:100%;border-radius:0;overflow:hidden}' +
+    '#cot-print .ch{background:#0d0d1a;padding:28px 32px 24px;display:flex;justify-content:space-between;align-items:flex-end}' +
+    '#cot-print .brand-name{font-size:26px;font-weight:800;color:#fff;letter-spacing:2px;text-transform:uppercase}' +
+    '#cot-print .brand-name span{color:#c8a84b}' +
+    '#cot-print .brand-tag{font-size:10px;color:#aaa;letter-spacing:3px;text-transform:uppercase;margin-top:4px}' +
+    '#cot-print .cot-num{font-size:18px;font-weight:700;color:#c8a84b;text-align:right}' +
+    '#cot-print .cot-lbl{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:2px;margin-bottom:3px;text-align:right}' +
+    '#cot-print .cot-fecha{font-size:11px;color:#bbb;margin-top:3px;text-align:right}' +
+    '#cot-print .accent{height:4px;background:#c8a84b}' +
+    '#cot-print .body{padding:28px 32px}' +
+    '#cot-print .cli-box{background:#f7f6f2;border-left:4px solid #c8a84b;padding:14px 18px;border-radius:0 8px 8px 0;margin-bottom:24px}' +
+    '#cot-print .cli-lbl{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:#999;margin-bottom:4px}' +
+    '#cot-print .cli-nom{font-size:18px;font-weight:700;color:#0d0d1a}' +
+    '#cot-print .sec-title{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:#c8a84b;font-weight:700;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #e8e4d8;margin-top:20px}' +
+    '#cot-print table{width:100%;border-collapse:collapse}' +
+    '#cot-print .dl{padding:8px 0;color:#555;font-size:13px;border-bottom:1px solid #f0ede4;width:55%}' +
+    '#cot-print .dr{padding:8px 0;font-size:13px;text-align:right;font-weight:500;border-bottom:1px solid #f0ede4}' +
+    '#cot-print .dl-sub{padding:6px 0;color:#888;font-size:12px;border-bottom:1px dashed #f0ede4;width:55%}' +
+    '#cot-print .dr-sub{padding:6px 0;font-size:12px;text-align:right;color:#666;border-bottom:1px dashed #f0ede4}' +
+    '#cot-print .dl-total{padding:10px 0;font-weight:700;font-size:14px;color:#0d0d1a}' +
+    '#cot-print .dr-total{padding:10px 0;font-weight:700;font-size:14px;text-align:right;color:#0d0d1a}' +
+    '#cot-print .total-box{background:#0d0d1a;border-radius:10px;padding:18px 24px;display:flex;justify-content:space-between;align-items:center;margin-top:24px}' +
+    '#cot-print .total-lbl{color:#aaa;font-size:12px;text-transform:uppercase;letter-spacing:1px}' +
+    '#cot-print .total-val{color:#c8a84b;font-size:28px;font-weight:800}' +
+    '#cot-print .nota{background:#fffbf0;border:1px solid #e8d08a;border-radius:8px;padding:12px 16px;margin-top:18px}' +
+    '#cot-print .nota p{font-size:12px;color:#7a6520;line-height:1.6}' +
+    '#cot-print .footer{background:#f7f6f2;border-top:1px solid #e8e4d8;padding:14px 32px;display:flex;justify-content:space-between;align-items:center;margin-top:24px}' +
+    '#cot-print .footer-brand{font-size:11px;font-weight:700;color:#0d0d1a;letter-spacing:1px;text-transform:uppercase}' +
+    '#cot-print .footer-brand span{color:#c8a84b}' +
+    '#cot-print .footer-note{font-size:10px;color:#aaa;text-align:right;line-height:1.5}' +
+    '#cot-print .badge-pend{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;background:#fff8e1;color:#b8860b;margin-left:8px}' +
+    '#cot-print .badge-ok{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;background:#edfdf5;color:#0f6e56;margin-left:8px}' +
+    '@media print{body > *:not(#pdf-overlay){display:none!important}#pdf-overlay{position:static!important;background:white!important;padding:0!important}#pdf-modal{box-shadow:none!important;max-width:100%!important;border-radius:0!important;padding:0!important;border:none!important}#pdf-modal > div:first-child{display:none!important}#cot-print{border:none!important}}' +
+    '</style>' +
+    '<div class="ch">' +
+      '<div><div class="brand-name">INKARI <span>3D HYO</span></div><div class="brand-tag">Impresi\u00f3n 3D de alta precisi\u00f3n \u00b7 Huancayo, Per\u00fa</div></div>' +
+      '<div><div class="cot-lbl">Cotizaci\u00f3n</div><div class="cot-num">' + d.nCot + '</div><div class="cot-fecha">' + d.fecha + '</div></div>' +
+    '</div>' +
+    '<div class="accent"></div>' +
+    '<div class="body">' +
+      '<div class="cli-box">' +
+        '<div class="cli-lbl">Cotizaci\u00f3n para</div>' +
+        '<div class="cli-nom">' + d.cliente + ' <span class="' + badgeClass + '">' + estadoLabel + '</span></div>' +
+      '</div>' +
+      '<div class="sec-title">Detalle del trabajo</div>' +
+      '<table>' + tablaDetalle + '</table>' +
+      '<div class="sec-title">Desglose de costos</div>' +
+      '<table>' + tablaDesglose + '</table>' +
+      '<div class="total-box">' +
+        '<div class="total-lbl">Total a pagar</div>' +
+        '<div class="total-val">' + precioFmt + '</div>' +
+      '</div>' +
+      '<div class="nota"><p>Esta cotizaci\u00f3n tiene validez de <strong>7 d\u00edas</strong> desde la fecha de emisi\u00f3n. Para confirmar el pedido se requiere un adelanto del <strong>50%</strong>. Precios en soles peruanos (S/).</p></div>' +
+    '</div>' +
+    '<div class="footer">' +
+      '<div class="footer-brand">INKARI <span>3D HYO</span></div>' +
+      '<div class="footer-note">Fabricado con tecnolog\u00eda de impresi\u00f3n 3D de alta precisi\u00f3n<br>Huancayo, Jun\u00edn \u2014 Per\u00fa</div>' +
+    '</div>';
+
+  document.getElementById('pdf-content').innerHTML = html;
+  document.getElementById('pdf-overlay').style.display = 'flex';
+}
+
+function cerrarPDF(){
+  document.getElementById('pdf-overlay').style.display='none';
+}
+
+function imprimirPDF(){
+  window.print();
+}
+
+/* ==================== INIT ==================== */
+buildFilSelect();
+toggleDiseno();
+calcular();
+recalcularCostoHora();
+initCfg();
+</script>
+
+<!-- MODAL CONFIRMACIÓN -->
+<div id="confirm-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:var(--card);border-radius:var(--radius-lg);padding:1.5rem;width:300px;border:1px solid var(--border);margin:1rem;box-shadow:0 8px 32px rgba(0,0,0,.12)">
+    <div style="font-size:15px;font-weight:600;margin-bottom:.5rem;color:var(--text)"><i class="ti ti-alert-triangle" style="color:#e67e22;margin-right:6px;font-size:16px"></i>Confirmar acción</div>
+    <p id="confirm-msg" style="font-size:13px;color:var(--muted);margin-bottom:1.25rem;line-height:1.5"></p>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" onclick="closeConfirm()"><i class="ti ti-x"></i> Cancelar</button>
+      <button class="btn danger" id="confirm-ok-btn" onclick="confirmOk()"><i class="ti ti-trash"></i> Eliminar</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- MODAL PDF -->
+<div id="pdf-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:9998;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px">
+  <div id="pdf-modal" style="background:#fff;border-radius:14px;width:100%;max-width:680px;box-shadow:0 20px 60px rgba(0,0,0,.4);overflow:hidden;margin:auto">
+    <div style="background:#1a1830;padding:12px 20px;display:flex;justify-content:space-between;align-items:center">
+      <span style="color:#c8a84b;font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase">Vista previa — Cotización</span>
+      <div style="display:flex;gap:8px">
+        <button onclick="imprimirPDF()" style="background:#c8a84b;color:#0d0d1a;border:none;padding:7px 16px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.5px">Imprimir / Guardar PDF</button>
+        <button onclick="cerrarPDF()" style="background:rgba(255,255,255,.15);color:#fff;border:none;padding:7px 12px;border-radius:7px;font-size:12px;cursor:pointer">Cerrar</button>
+      </div>
+    </div>
+    <div id="cot-print">
+      <div id="pdf-content"></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
